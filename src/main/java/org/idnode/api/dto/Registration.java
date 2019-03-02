@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * Identity attribute registration
+ * EcdsaKey attribute registration
  * <p>
  * A Trust-Net identity attribute registration request
  */

@@ -9,9 +9,19 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.idnode.android.provider.DbProvider;
+import org.idnode.api.client.IdClient;
+import org.idnode.api.dto.Endorsement;
+import org.idnode.api.dto.Registration;
+import org.idnode.attributes.StandardAttributes;
 import org.idnode.identity.Owner;
+import org.idnode.identity.SequenceHistory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.trustnet.util.Submitter;
 
 public class MainActivity extends AppCompatActivity {
+    final static private String TAG = "MainActivity";
+
     final private static int LOGIN = 0x01;
 
     @Override
@@ -25,12 +35,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int activity, int code, Intent result) {
         super.onActivityResult(activity, code, result);
-        switch(activity) {
+        switch (activity) {
             case LOGIN: {
-                Log.d("MainActivity", "Login result = " + (code == Activity.RESULT_OK ? "success" : "failed"));
+                Log.d(TAG, "Login result = " + (code == Activity.RESULT_OK ? "success" : "failed"));
                 if (code == Activity.RESULT_OK) {
                     String user = result.getStringExtra(LoginActivity.USER);
-                    Log.d("MainActivity", "User = " + user);
+                    Log.d(TAG, "User = " + user);
 
                     // initialize the owner
                     new OwnerInitializer(this).execute(user);
@@ -55,10 +65,36 @@ public class MainActivity extends AppCompatActivity {
             // read or generate private key from DB
             Owner.initialize(strings[0], new DbProvider(this.ctx));
 
-            // make sure we have all values we need
-            Owner.instance().getIdKey();
-            Owner.instance().getEncKey();
-            Owner.instance().getHistory("default");
+            // TODO: remove this after idnode starts persisting
+            Owner.instance().resetHistory();
+
+            // connect with Idnode app
+            Log.d(TAG, "Connection status: " + IdClient.setBaseUrl("http://192.168.1.15:1080"));
+
+            // check for registration of standard attributes, register if not present
+            if (!Owner.instance().isEncKeyRegistered()) {
+                if (!Owner.instance().registerEncKey()) {
+                    Log.e(TAG, "Failed to register encryption key");
+                }
+            }
+            Log.d(TAG, "Encryption key registered: " + Owner.instance().isEncKeyRegistered());
+
+            if (Owner.instance().getRegsiteredFirstName() == null) {
+                if (!Owner.instance().registerFirstName("Foo")) {
+                    Log.e(TAG, "Failed to register first name");
+                }
+            }
+            Log.d(TAG, "Firstname: " + Owner.instance().getRegsiteredFirstName());
+
+            if (Owner.instance().getRegisteredLastName() == null) {
+                if (!Owner.instance().registerLastName("Bar")) {
+                    Log.e(TAG, "Failed to register last name");
+                }
+            }
+            Log.d(TAG, "Lastname: " + Owner.instance().getRegisteredLastName());
+
+            ResponseEntity<? extends Object> result = IdClient.instance().getEndorsement(Owner.instance().getPublicId(), StandardAttributes.PreferredEmail);
+            Log.d(TAG, "PreferredEmail is " + (result.getStatusCode() == HttpStatus.OK ? ((Endorsement) result.getBody()).getEncValue() : result.getBody().toString()));
             return null;
         }
     }

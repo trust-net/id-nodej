@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * Identity Operation
+ * EcdsaKey Operation
  * <p>
  * A Trust-Net identity application operation request
  */

@@ -4,7 +4,7 @@ package org.idnode.identity;
  * Created by bhadoria on 2/28/19.
  */
 
-class SequenceHistory {
+public class SequenceHistory {
     public static final String FIRST_TX = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     public static final long FIRST_SEQ = 0x01;
 

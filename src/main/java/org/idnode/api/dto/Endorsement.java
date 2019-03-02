@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * Identity attribute endorsement
+ * EcdsaKey attribute endorsement
  * <p>
  * A Trust-Net identity attribute endorsement request
  */

@@ -5,7 +5,7 @@ import org.idnode.api.dto.Registration;
 import org.spongycastle.util.encoders.Base64;
 
 /**
- * A Trust-Net Identity's public ECIES key attribute
+ * A Trust-Net EcdsaKey's public ECIES key attribute
  * Created by bhadoria on 2/27/19.
  */
 

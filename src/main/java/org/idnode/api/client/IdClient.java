@@ -25,8 +25,6 @@ import org.trustnet.util.Submitter;
  */
 
 public class IdClient {
-    private static final Logger logger = LoggerFactory.getLogger(IdClient.class);
-
     private RestTemplate restTemplate;
     private static String baseUrl;
 
@@ -36,12 +34,15 @@ public class IdClient {
 
     public static final byte[] ShardId = AppName.getBytes();
 
-    static {
-        // TBD: change below to read key from persisted DB
-        Submitter.initialize(new ECKey());
+    static public boolean setBaseUrl(String url) {
+        // ping url to make sure its reachable
+        RestTemplate restTemplate = new RestTemplate();
+        if (restTemplate.getForEntity(url + "/ping", Object.class).getStatusCode() == HttpStatus.OK) {
+            baseUrl = url;
+            return true;
+        }
+        return false;
     }
-
-    static public void setBaseUrl(String url) { baseUrl = url; }
 
     static public String getBaseUrl() {
         return baseUrl;
@@ -83,14 +84,11 @@ public class IdClient {
             String payload = Base64.toBase64String(mapper.writeValueAsString(op).getBytes());
             // create a transaction request
             SubmitRequest txRequest = Submitter.instance().newRequest(ShardId, payload);
-            Log.d("Submitting Request", txRequest.toString());
 
             // submit transaction
-            ResponseEntity<SubmitResult> response = restTemplate.postForEntity(baseUrl + "/transactions",
+            ResponseEntity<SubmitResult> response = restTemplate.postForEntity(baseUrl + "/submit",
                     txRequest,
                     SubmitResult.class);
-            logger.debug("Submit response: {}", response.toString());
-            Log.d("Submit Response", response.toString());
 
             // for success case, update submitter client with result
             if (response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) {
