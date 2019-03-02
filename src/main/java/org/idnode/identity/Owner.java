@@ -161,6 +161,8 @@ public class Owner {
      */
     public void resetHistory() {
         setHistory(IdClient.AppName, new SequenceHistory());
+        // re-initialize submitter after resetting owner's state
+        Submitter.initialize(owner.getIdKey(), owner.getHistory(IdClient.AppName).getNextSeq(), owner.getHistory(IdClient.AppName).getLastTx());
     }
 
     /**
