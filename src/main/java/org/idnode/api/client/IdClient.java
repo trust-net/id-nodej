@@ -1,7 +1,5 @@
 package org.idnode.api.client;
 
-import android.util.Log;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.ethereum.crypto.ECKey;
